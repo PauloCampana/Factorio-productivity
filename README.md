@@ -1,3 +1,3 @@
-Factorio productivity module payoff table made with the shiny and reactable packages in R
+# Factorio productivity module payoff table
 
-Live preview avaliable at https://anntauri.shinyapps.io/Factorio/
+live preview avaliable at (https://anntauri.shinyapps.io/Factorio/)
