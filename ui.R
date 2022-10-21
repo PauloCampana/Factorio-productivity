@@ -1,10 +1,12 @@
 library(shiny)
-library(reactablefmtr)
 library(shinythemes)
+library(reactablefmtr)
+
 shinyUI(
     fluidPage(
         theme = shinytheme("cosmo"),
-        titlePanel("Productivity module seconds to pay-off table"),
+        titlePanel(h2(id = "head", "Productivity module pay-off table"), windowTitle = "Productivity"),
+        tags$style(HTML("#head {font-weight: normal;}")),
         sidebarLayout(
             sidebarPanel(
 

@@ -1,6 +1,8 @@
 library(shiny)
 library(dplyr)
+library(lubridate)
 library(reactablefmtr)
+
 shinyServer(function(input, output){
 
     speed <- reactive({
@@ -96,25 +98,22 @@ shinyServer(function(input, output){
                 (data()[ ,4] + module$penalty1[data()[ ,5]]) /
                 (1 - 1 / module$prod1[data()[ ,5]])
             ) |> round(digits = 0)
-        ) |> arrange(Tier3)
+        ) |> mutate(
+                Tier3formatted = Tier3 |> as.duration() |> as.period() |> tolower(),
+                Tier2formatted = Tier2 |> as.duration() |> as.period() |> tolower(),
+                Tier1formatted = Tier1 |> as.duration() |> as.period() |> tolower()
+        )
     })
 
     output$table <- renderReactable({
         reactable(
             tabledata(),
             theme = cosmo(header_font_size = 20),
-            pagination = FALSE, highlight = TRUE, showSortable = TRUE,
-            defaultColDef = colDef(
-                align = "center", vAlign = "center",
-                cell = data_bars(tabledata(),
-                    text_position = "above", bold_text = TRUE,
-                    fill_color = "#8080c0", bar_height = 10, round_edges = TRUE,
-                    border_style = "solid", border_width = "1px", border_color = "#00000040"
-                )
-            ),
+            pagination = FALSE, highlight = TRUE, sortable = FALSE,
+            showSortable = TRUE, defaultSorted = "Tier3",
             columns = list(
                 Item = colDef(
-                    align = "left", sortable = FALSE, filterable = TRUE,
+                    align = "left", filterable = TRUE,
                     header = tagList(
                         span(style = "display: inline-block; width: 32px;",
                              img(src = "Item.png", width = 32, height = 32)
@@ -129,7 +128,14 @@ shinyServer(function(input, output){
                         )
                     }
                 ),
-                Tier3 = colDef(
+                Tier3formatted = colDef(
+                    align = "center", vAlign = "center",
+                    cell = data_bars(
+                        tabledata(), fill_by = "Tier3",
+                        text_position = "above", bold_text = TRUE,
+                        fill_color = "#ffa020", bar_height = 10, round_edges = TRUE,
+                        border_style = "solid", border_width = "1px", border_color = "#00000040"
+                    ),
                     header = tagList(
                         span(style = "display: inline-block; width: 32px;",
                              img(src = "Tier3.png", width = 32, height = 32)
@@ -137,7 +143,14 @@ shinyServer(function(input, output){
                         span(style = "font-weight: bold; margin-left: 8px;", "Tier 3")
                     )
                 ),
-                Tier2 = colDef(
+                Tier2formatted = colDef(
+                    align = "center", vAlign = "center",
+                    cell = data_bars(
+                        tabledata(), fill_by = "Tier2",
+                        text_position = "above", bold_text = TRUE,
+                        fill_color = "#ff9010", bar_height = 10, round_edges = TRUE,
+                        border_style = "solid", border_width = "1px", border_color = "#00000040"
+                    ),
                     header = tagList(
                         span(style = "display: inline-block; width: 32px;
                              ",
@@ -146,14 +159,24 @@ shinyServer(function(input, output){
                         span(style = "font-weight: bold; margin-left: 8px;", "Tier 2")
                     )
                 ),
-                Tier1 = colDef(
+                Tier1formatted = colDef(
+                    align = "center", vAlign = "center",
+                    cell = data_bars(
+                        tabledata(), fill_by = "Tier1",
+                        text_position = "above", bold_text = TRUE,
+                        fill_color = "#ff8000", bar_height = 10, round_edges = TRUE,
+                        border_style = "solid", border_width = "1px", border_color = "#00000040"
+                    ),
                     header = tagList(
                         span(style = "display: inline-block; width: 32px;",
                              img(src = "Tier1.png", width = 32, height = 32)
                         ),
                         span(style = "font-weight: bold; margin-left: 8px;", "Tier 1")
                     )
-                )
+                ),
+                Tier3 = colDef(show = FALSE),
+                Tier2 = colDef(show = FALSE),
+                Tier1 = colDef(show = FALSE)
             )
         )
     })
