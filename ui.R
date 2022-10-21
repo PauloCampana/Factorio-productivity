@@ -16,6 +16,20 @@ shinyUI(
                         "MK III Assembler" |> strong())
                 ),
 
+                selectInput(
+                    inputId = "speedtier",
+                    img(src = "Speed.png", width = 24, height = 24,
+                            "Speed module" |> strong()),
+                    choices = list("Tier 3", "Tier 2", "Tier 1"),
+                    selected = "Tier 3"
+                ),
+
+                sliderInput(
+                    inputId = "beacon", value = 8, min = 0, max = 20,
+                    img(src = "Beacon.png", width = 24, height = 24,
+                        "Numer of beacons")
+                ),
+
                 numericInput(
                     inputId = "sciencetime", value = 60, min = 0, max = 60,
                     img(src = "Research.png", width = 24, height = 24,
@@ -24,7 +38,6 @@ shinyUI(
 
                 checkboxGroupInput(
                     inputId = "sciencecost", label = "Science packs",
-                    selected = c(3, 7, 27.7, 98.5, 106, 225),
                     choiceNames = list(
                         img(src = "Automation science.png", width = 24, height = 24,
                             "Automation science" |> strong()),
@@ -41,8 +54,9 @@ shinyUI(
                         img(src = "Space science.png", width = 24, height = 24,
                             "Space science" |> strong())
                     ),
-                    choiceValues = list(3, 7, 24.5, 27.7, 98.5, 106, 225)
-                ),
+                    choiceValues = list(3, 7, 24.5, 27.7, 98.5, 106, 225),
+                    selected = c(3, 7, 27.7, 98.5, 106, 225)
+                )
 
             ),
             mainPanel(

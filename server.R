@@ -13,6 +13,12 @@ shinyServer(function(input, output){
         if(input$assembler) 4
         else 2
     })
+    tier <- reactive({
+        switch(
+            input$speedtier,
+            "Tier 3" = 3, "Tier 2" = 2, "Tier 1" = 1
+        )
+    })
 
     module <- data.frame(
         cost1 = c(70.4, 140.8, 211.2, 281.6),
@@ -23,7 +29,8 @@ shinyServer(function(input, output){
         prod3 = c(1.1, 1.2, 1.3, 1.4),
         penalty1 = c(-0.05, -0.1, -0.15, -0.2),
         penalty2 = c(-0.1, -0.2, -0.3, -0.4),
-        penalty3 = c(-0.15, -0.3, -0.45, -0.6)
+        penalty3 = c(-0.15, -0.3, -0.45, -0.6),
+        speed = c(0.2, 0.3, 0.5, 999)
     )
 
     data <- reactive({
@@ -78,24 +85,18 @@ shinyServer(function(input, output){
         data.frame(
             Item = data()[ ,1],
             Tier3 = (
-                module$cost3[data()[ ,5]] *
-                data()[ ,3] /
-                data()[ ,2] /
-                (data()[ ,4] + module$penalty3[data()[ ,5]]) /
+                module$cost3[data()[ ,5]] * data()[ ,3] / data()[ ,2] /
+                (data()[ ,4] + module$penalty3[data()[ ,5]] + input$beacon / 2 * module$speed[tier()]) /
                 (1 - 1 / module$prod3[data()[ ,5]])
             ) |> round(digits = 0),
             Tier2 = (
-                module$cost2[data()[ ,5]] *
-                data()[ ,3] /
-                data()[ ,2] /
-                (data()[ ,4] + module$penalty2[data()[ ,5]]) /
+                module$cost2[data()[ ,5]] * data()[ ,3] / data()[ ,2] /
+                (data()[ ,4] + module$penalty2[data()[ ,5]] + input$beacon / 2 * module$speed[tier()]) /
                 (1 - 1 / module$prod2[data()[ ,5]])
             ) |> round(digits = 0),
             Tier1 = (
-                module$cost1[data()[ ,5]] *
-                data()[ ,3] /
-                data()[ ,2] /
-                (data()[ ,4] + module$penalty1[data()[ ,5]]) /
+                module$cost1[data()[ ,5]] * data()[ ,3] / data()[ ,2] /
+                (data()[ ,4] + module$penalty1[data()[ ,5]] + input$beacon / 2 * module$speed[tier()]) /
                 (1 - 1 / module$prod1[data()[ ,5]])
             ) |> round(digits = 0)
         ) |> mutate(
