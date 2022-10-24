@@ -16,16 +16,8 @@ shinyUI(
                         "MK III Assembler" |> strong())
                 ),
 
-                selectInput(
-                    inputId = "speedtier",
-                    img(src = "Speed.png", width = 24, height = 24,
-                            "Speed module" |> strong()),
-                    choices = list("Tier 3", "Tier 2", "Tier 1"),
-                    selected = "Tier 3"
-                ),
-
                 sliderInput(
-                    inputId = "beacon", value = 8, min = 0, max = 20,
+                    inputId = "beacon", value = 8, min = 0, max = 12,
                     img(src = "Beacon.png", width = 24, height = 24,
                         "Numer of beacons")
                 ),

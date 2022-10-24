@@ -5,20 +5,8 @@ library(reactablefmtr)
 
 shinyServer(function(input, output){
 
-    speed <- reactive({
-        if(input$assembler) 1.25
-        else 0.75
-    })
-    slots <- reactive({
-        if(input$assembler) 4
-        else 2
-    })
-    tier <- reactive({
-        switch(
-            input$speedtier,
-            "Tier 3" = 3, "Tier 2" = 2, "Tier 1" = 1
-        )
-    })
+    speed <- input$assembler |> ifelse(1.25, 0.75) |> reactive()
+    slots <- input$assembler |> ifelse(4, 2) |> reactive()
 
     module <- data.frame(
         cost1 = c(70.4, 140.8, 211.2, 281.6),
@@ -85,18 +73,21 @@ shinyServer(function(input, output){
         data.frame(
             Item = data()[ ,1],
             Tier3 = (
-                (module$cost3[data()[ ,5]] + input$beacon * module$cost3[2]) * data()[ ,3] / data()[ ,2] /
-                (data()[ ,4] * (1 + module$penalty3[data()[ ,5]] + input$beacon * module$speed[tier()])) /
+                (module$cost3[data()[ ,5]] + input$beacon * module$cost3[2]) *
+                data()[ ,3] / data()[ ,2] /
+                (data()[ ,4] * (1 + module$penalty3[data()[ ,5]] + input$beacon * module$speed[3])) /
                 (1 - 1 / module$prod3[data()[ ,5]])
             ) |> round(digits = 0),
             Tier2 = (
-                (module$cost2[data()[ ,5]] + input$beacon * module$cost2[2]) * data()[ ,3] / data()[ ,2] /
-                (data()[ ,4] * (1 + module$penalty2[data()[ ,5]] + input$beacon * module$speed[tier()])) /
+                (module$cost2[data()[ ,5]] + input$beacon * module$cost2[2]) *
+                data()[ ,3] / data()[ ,2] /
+                (data()[ ,4] * (1 + module$penalty2[data()[ ,5]] + input$beacon * module$speed[2])) /
                 (1 - 1 / module$prod2[data()[ ,5]])
             ) |> round(digits = 0),
             Tier1 = (
-                (module$cost1[data()[ ,5]] + input$beacon * module$cost1[2]) * data()[ ,3] / data()[ ,2] /
-                (data()[ ,4] * (1 + module$penalty1[data()[ ,5]] + input$beacon * module$speed[tier()])) /
+                (module$cost1[data()[ ,5]] + input$beacon * module$cost1[2]) *
+                data()[ ,3] / data()[ ,2] /
+                (data()[ ,4] * (1 + module$penalty1[data()[ ,5]] + input$beacon * module$speed[1])) /
                 (1 - 1 / module$prod1[data()[ ,5]])
             ) |> round(digits = 0)
         ) |> mutate(
@@ -138,8 +129,13 @@ shinyServer(function(input, output){
                         border_style = "solid", border_width = "1px", border_color = "#00000040"
                     ),
                     header = tagList(
+                        if(input$beacon > 0){
+                            span(style = "display: inline-block; width: 32px;",
+                                img(src = "Speed3.png", width = 32, height = 32)
+                            )
+                        },
                         span(style = "display: inline-block; width: 32px;",
-                             img(src = "Tier3.png", width = 32, height = 32)
+                             img(src = "Prod3.png", width = 32, height = 32)
                         ),
                         span(style = "font-weight: bold; margin-left: 8px;", "Tier 3")
                     )
@@ -153,9 +149,13 @@ shinyServer(function(input, output){
                         border_style = "solid", border_width = "1px", border_color = "#00000040"
                     ),
                     header = tagList(
-                        span(style = "display: inline-block; width: 32px;
-                             ",
-                             img(src = "Tier2.png", width = 32, height = 32)
+                        if(input$beacon > 0){
+                            span(style = "display: inline-block; width: 32px;",
+                                img(src = "Speed2.png", width = 32, height = 32)
+                            )
+                        },
+                        span(style = "display: inline-block; width: 32px;",
+                             img(src = "Prod2.png", width = 32, height = 32)
                         ),
                         span(style = "font-weight: bold; margin-left: 8px;", "Tier 2")
                     )
@@ -169,8 +169,13 @@ shinyServer(function(input, output){
                         border_style = "solid", border_width = "1px", border_color = "#00000040"
                     ),
                     header = tagList(
+                        if(input$beacon > 0){
+                            span(style = "display: inline-block; width: 32px;",
+                                img(src = "Speed1.png", width = 32, height = 32)
+                            )
+                        },
                         span(style = "display: inline-block; width: 32px;",
-                             img(src = "Tier1.png", width = 32, height = 32)
+                             img(src = "Prod1.png", width = 32, height = 32)
                         ),
                         span(style = "font-weight: bold; margin-left: 8px;", "Tier 1")
                     )
