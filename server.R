@@ -48,7 +48,7 @@ shinyServer(function(input, output){
             ),
             cost = c(
                 0.16, 0.16, 0.15, 0.18, 0.29,
-                1, 1, 2, 5, 1.5, 2.3, 3, 7.8, 1.9,
+                1, 1, 2, 5, 1.5, 2.3, 2.7, 7.8, 1.9,
                 0.5, 0.5, 2, 2.5, 12, 74.6, 9, 17, 44.4,
                 145, 41.5, 16,
                 3, 7, 24.5, 27.7, 98.5, 106, 225,
@@ -85,18 +85,18 @@ shinyServer(function(input, output){
         data.frame(
             Item = data()[ ,1],
             Tier3 = (
-                module$cost3[data()[ ,5]] * data()[ ,3] / data()[ ,2] /
-                (data()[ ,4] + module$penalty3[data()[ ,5]] + input$beacon / 2 * module$speed[tier()]) /
+                (module$cost3[data()[ ,5]] + input$beacon * module$cost3[2]) * data()[ ,3] / data()[ ,2] /
+                (data()[ ,4] * (1 + module$penalty3[data()[ ,5]] + input$beacon * module$speed[tier()])) /
                 (1 - 1 / module$prod3[data()[ ,5]])
             ) |> round(digits = 0),
             Tier2 = (
-                module$cost2[data()[ ,5]] * data()[ ,3] / data()[ ,2] /
-                (data()[ ,4] + module$penalty2[data()[ ,5]] + input$beacon / 2 * module$speed[tier()]) /
+                (module$cost2[data()[ ,5]] + input$beacon * module$cost2[2]) * data()[ ,3] / data()[ ,2] /
+                (data()[ ,4] * (1 + module$penalty2[data()[ ,5]] + input$beacon * module$speed[tier()])) /
                 (1 - 1 / module$prod2[data()[ ,5]])
             ) |> round(digits = 0),
             Tier1 = (
-                module$cost1[data()[ ,5]] * data()[ ,3] / data()[ ,2] /
-                (data()[ ,4] + module$penalty1[data()[ ,5]] + input$beacon / 2 * module$speed[tier()]) /
+                (module$cost1[data()[ ,5]] + input$beacon * module$cost1[2]) * data()[ ,3] / data()[ ,2] /
+                (data()[ ,4] * (1 + module$penalty1[data()[ ,5]] + input$beacon * module$speed[tier()])) /
                 (1 - 1 / module$prod1[data()[ ,5]])
             ) |> round(digits = 0)
         ) |> mutate(
