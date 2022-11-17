@@ -88,9 +88,9 @@ tabledata <- data.frame(
         (1 - 1 / module$prod1[data()[ ,5]])
     ) |> round(digits = 0)
 ) |> mutate(
-        Tier3formatted = Tier3 |> as.duration() |> as.period() |> tolower(),
-        Tier2formatted = Tier2 |> as.duration() |> as.period() |> tolower(),
-        Tier1formatted = Tier1 |> as.duration() |> as.period() |> tolower()
+    Tier3formatted = Tier3 |> as.duration() |> as.period() |> tolower(),
+    Tier2formatted = Tier2 |> as.duration() |> as.period() |> tolower(),
+    Tier1formatted = Tier1 |> as.duration() |> as.period() |> tolower()
 ) |> reactive()
 
 
