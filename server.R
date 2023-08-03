@@ -12,6 +12,10 @@ function(input, output, session) {
 
     speed <- input$assembler |> ifelse(1.25, 0.75) |> reactive()
     slots <- input$assembler |> ifelse(4, 2) |> reactive()
+    machines_on_beacon <- ifelse(
+        input$machines_on_beacon == 0,
+        1, input$machines_on_beacon
+    ) |> reactive()
 
         tier1 <- sum(c(  15, 32.5,   5, 0, 0,   100, 0, 0, 0,    0) * raw()) |> reactive()
         tier2 <- sum(c( 190,  355,  35, 0, 0, 737.5, 0, 0, 0, 87.5) * raw()) |> reactive()
@@ -75,7 +79,7 @@ function(input, output, session) {
                "Chemical science" = c(   12,    7.5,   1.5,     0,     0,   37.5,     0,  0,   0,   7.5),
              "Production science" = c( 52.5,  19.17,  3.33, 11.67,     0,  66.67,     0,  0,   0,     0),
                 "Utility science" = c(33.33,  49.83,  3.83,     0,     0, 101.67,     0,  5,   0, 58.33),
-                  "Space science" = c(57.54, 101.79,  9.95,     0,     0, 222.25, 115.5,  5,   0, 54.25),
+                  "Space science" = c(57.54, 101.79,  9.95,     0,     0, 222.25, 115.5,  0,   0, 54.25),
              "Uranium processing" = c(    0,      0,     0,     0,    10,      0,     0,  0,   0,     0),
              "Kovarex enrichment" = c(    0,      0,     0,     0, 29.59,      0,     0,  0,   0,     0),
               "Uranium fuel cell" = c(    1,      0,     0,     0,  21.7,      0,     0,  0,   0,     0),
@@ -86,56 +90,17 @@ function(input, output, session) {
              "Heavy oil cracking" = c(    0,      0,     0,     0,     0,      0,     0, 40,   0,    30),
              "Light oil cracking" = c(    0,      0,     0,     0,     0,      0,    30,  0,   0,    30),
                       "Lubricant" = c(    0,      0,     0,     0,     0,      0,     0,  1,   0,     0),
-                  "Sulfuric acid" = c( 0.02,      0,     0,     0,     0,    1.5,     0, 10,   0,   3.5),
+                  "Sulfuric acid" = c( 0.02,      0,     0,     0,     0,    1.5,     0,  0,   0,   3.5),
                        "Research" = researchcost()
     ) |> reactive()
 
     recipe <- tibble(
         recipe = cost() |> colnames(),
-        cost = c(
-            sum(cost()["Iron plate"             ] * raw()),
-            sum(cost()["Copper plate"           ] * raw()),
-            sum(cost()["Stone brick"            ] * raw()),
-            sum(cost()["Steel plate"            ] * raw()),
-            sum(cost()["Solid fuel petroleum"   ] * raw()),
-            sum(cost()["Solid fuel light"       ] * raw()),
-            sum(cost()["Solid fuel heavy"       ] * raw()),
-            sum(cost()["Plastic bar"            ] * raw()),
-            sum(cost()["Sulfur"                 ] * raw()),
-            sum(cost()["Battery"                ] * raw()),
-            sum(cost()["Explosives"             ] * raw()),
-            sum(cost()["Copper cable"           ] * raw()),
-            sum(cost()["Iron stick"             ] * raw()),
-            sum(cost()["Iron gear wheel"        ] * raw()),
-            sum(cost()["Empty barrel"           ] * raw()),
-            sum(cost()["Electronic circuit"     ] * raw()),
-            sum(cost()["Advanced circuit"       ] * raw()),
-            sum(cost()["Processing unit"        ] * raw()),
-            sum(cost()["Engine unit"            ] * raw()),
-            sum(cost()["Electric engine unit"   ] * raw()),
-            sum(cost()["Flying robot frame"     ] * raw()),
-            sum(cost()["Rocket control unit"    ] * raw()),
-            sum(cost()["Low density structure"  ] * raw()),
-            sum(cost()["Rocket fuel"            ] * raw()),
-            sum(cost()["Automation science"     ] * raw()),
-            sum(cost()["Logistic science"       ] * raw()),
-            sum(cost()["Military science"       ] * raw()),
-            sum(cost()["Chemical science"       ] * raw()),
-            sum(cost()["Production science"     ] * raw()),
-            sum(cost()["Utility science"        ] * raw()),
-            sum(cost()["Space science"          ] * raw()),
-            sum(cost()["Uranium processing"     ] * raw()),
-            sum(cost()["Kovarex enrichment"     ] * raw()),
-            sum(cost()["Uranium fuel cell"      ] * raw()),
-            sum(cost()["Nuclear fuel"           ] * raw()),
-            sum(cost()["Basic oil processing"   ] * raw()),
-            sum(cost()["Advanced oil processing"] * raw()),
-            sum(cost()["Coal liquefaction"      ] * raw()),
-            sum(cost()["Heavy oil cracking"     ] * raw()),
-            sum(cost()["Light oil cracking"     ] * raw()),
-            sum(cost()["Lubricant"              ] * raw()),
-            sum(cost()["Sulfuric acid"          ] * raw()),
-            sum(cost()["Research"               ] * raw())
+        cost = sapply(
+            recipe,
+            function(x) {
+                sum(cost()[x] * raw())
+            }
         ),
         time = c(
             3.2, 3.2, 3.2, 16,
@@ -175,7 +140,7 @@ function(input, output, session) {
     payoff <- tibble(
         totalcost3 =
             recipe()["slots"] * module()[["cost"]][3] +
-            input$beacons_on_machine / input$machines_on_beacon * (2 * module()[["cost"]][3] + beacon()) +
+            input$beacons_on_machine / machines_on_beacon() * (2 * module()[["cost"]][3] + beacon()) +
             (recipe()["speed"] == 1.25) * assembler(),
         totalspeed3 =
             recipe()["speed"] * (
@@ -192,7 +157,7 @@ function(input, output, session) {
 
         totalcost2 =
             recipe()["slots"] * module()[["cost"]][2] +
-            input$beacons_on_machine / input$machines_on_beacon * (2 * module()[["cost"]][2] + beacon()) +
+            input$beacons_on_machine / machines_on_beacon() * (2 * module()[["cost"]][2] + beacon()) +
             (recipe()["speed"] == 1.25) * assembler(),
         totalspeed2 =
             recipe()["speed"] * (
@@ -209,7 +174,7 @@ function(input, output, session) {
 
         totalcost1 =
             recipe()["slots"] * module()[["cost"]][1] +
-            input$beacons_on_machine / input$machines_on_beacon * (2 * module()[["cost"]][1] + beacon()) +
+            input$beacons_on_machine / machines_on_beacon() * (2 * module()[["cost"]][1] + beacon()) +
             (recipe()["speed"] == 1.25) * assembler(),
         totalspeed1 =
             recipe()["speed"] * (
